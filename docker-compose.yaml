@@ -1,0 +1,18 @@
+services:
+  # SubManager:
+
+  SubManagerDb:
+    image: postgres:16.3
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "psql_isready -U ${POSTGRES_USER} -d ${POSTGRES_NAME} "]
+      interval: 5s
+      timeout: 5s
+      retries: 5

@@ -1,0 +1,594 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Subscription manager",
+    "version": "1.0.0",
+    "description": "Simple RESTful service for aggregating and managing monthly subscription data of online users.",
+    "contact": {
+      "name": "Bsagat",
+      "email": "sagatbekbolat854@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development server"
+    },
+    {
+      "url": "https://localhost:8080",
+      "description": "Secured server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "CRUD",
+      "description": "Subscription CRUD operations"
+    },
+    {
+      "name": "List",
+      "description": "Subscription List operations"
+    },
+    {
+      "name": "Summary",
+      "description": "Subscription Summary operations"
+    }
+  ],
+  "paths": {
+    "/subs": {
+      "post": {
+        "summary": "Create Subscription",
+        "tags": [
+          "CRUD"
+        ],
+        "description": "Create a new subscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Succesfully created new subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required subscription fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Subscription",
+        "tags": [
+          "CRUD"
+        ],
+        "description": "Update an existing user subscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Succesfully updated subscription data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required subscription fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subs/{user_id}": {
+      "get": {
+        "summary": "Get all user subscriptions",
+        "tags": [
+          "List"
+        ],
+        "description": "Retrieve all subscriptions for a specific user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscriptions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty user ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User subscriptions not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all user subscriptions",
+        "tags": [
+          "List"
+        ],
+        "description": "Delete all subscriptions associated with the specified user ID",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted user subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty user ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User subscriptions not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subs/{user_id}/{service_name}": {
+      "get": {
+        "summary": "Get specific user subscription",
+        "tags": [
+          "CRUD"
+        ],
+        "description": "Retrieve a specific subscription by user ID and service name",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Subscription service name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Yandex Plus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User subscription data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete specific user subscription",
+        "tags": [
+          "CRUD"
+        ],
+        "description": "Delete a specific subscription by user ID and service name",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Subscription service name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Yandex Plus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted user subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/summary": {
+      "get": {
+        "summary": "Get subscription summary",
+        "tags": [
+          "Summary"
+        ],
+        "description": "Get summary of user subscriptions by optional filters (date range, user ID, service name)",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date for filtering",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2025-05-15T00:00:00.000Z"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date for filtering",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2025-07-15T00:00:00.000Z"
+            }
+          },
+          {
+            "name": "user_ID",
+            "in": "query",
+            "description": "User UUID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "query",
+            "description": "Name of the subscription service",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Yandex Plus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved subscription summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User subscriptions not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Subscription": {
+        "type": "object",
+        "required": [
+          "service_name",
+          "price",
+          "user_id",
+          "start_date"
+        ],
+        "properties": {
+          "service_name": {
+            "type": "string",
+            "example": "Yandex Plus"
+          },
+          "price": {
+            "type": "integer",
+            "example": 400
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "185925eb-2114-4c2a-bae7-6fdafa58d1d4"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-07-15T00:00:00.000Z"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-08-15T00:00:00.000Z"
+          }
+        }
+      },
+      "Subscriptions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Subscription"
+        }
+      },
+      "SummaryModel": {
+        "type": "object",
+        "properties": {
+          "total_price": {
+            "type": "integer",
+            "example": 2400
+          },
+          "total_subscriptions": {
+            "type": "integer",
+            "example": 6
+          },
+          "subscriptions": {
+            "$ref": "#/components/schemas/Subscriptions"
+          }
+        }
+      },
+      "ErrorModel": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response status code",
+            "example": 404
+          },
+          "error": {
+            "type": "string",
+            "description": "Response error message",
+            "example": "User subscriptions are not found"
+          }
+        }
+      },
+      "Message": {
+        "type": "string",
+        "example": "Subscription created"
+      }
+    }
+  }
+}

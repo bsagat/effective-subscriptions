@@ -1,1 +1,5 @@
-# effective_mobile_challenge
+# effective-subscriptions
+
+Effective mobile challenge
+
+Subscription service manager

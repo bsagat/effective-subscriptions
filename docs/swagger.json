@@ -72,6 +72,16 @@
               }
             }
           },
+          "409": {
+            "description": "Subscription data is already exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Unexpected server error",
             "content": {
@@ -415,7 +425,7 @@
         }
       }
     },
-    "/summary": {
+    "/subs/summary": {
       "get": {
         "summary": "Get subscription summary",
         "tags": [
@@ -431,7 +441,7 @@
             "schema": {
               "type": "string",
               "format": "date",
-              "example": "2025-05-15T00:00:00.000Z"
+              "example": "2025-05-15"
             }
           },
           {
@@ -442,7 +452,7 @@
             "schema": {
               "type": "string",
               "format": "date",
-              "example": "2025-07-15T00:00:00.000Z"
+              "example": "2025-07-15"
             }
           },
           {
@@ -539,12 +549,12 @@
           "start_date": {
             "type": "string",
             "format": "date",
-            "example": "2025-07-15T00:00:00.000Z"
+            "example": "2025-07-15"
           },
           "end_date": {
             "type": "string",
             "format": "date",
-            "example": "2025-08-15T00:00:00.000Z"
+            "example": "2025-08-15"
           }
         }
       },

@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/signal"
 	httpserver "submanager/internal/adapters/http"
+	"submanager/internal/adapters/repo"
 	"submanager/internal/pkg/postgres"
+	"submanager/internal/service"
 	"syscall"
 )
 
@@ -19,8 +21,6 @@ type App struct {
 }
 
 func New(cfg Config, log *slog.Logger) *App {
-	server := httpserver.New(cfg.Host, cfg.Port, log)
-
 	log.Info("Connecting to database...")
 	postgresDB, err := postgres.Connect(cfg.DB)
 	if err != nil {
@@ -28,6 +28,10 @@ func New(cfg Config, log *slog.Logger) *App {
 		os.Exit(1)
 	}
 	log.Info("Database connection estabilished...")
+
+	subsRepo := repo.NewSubsRepo(postgresDB.DB)
+	subsService := service.NewSubsService(subsRepo, log)
+	server := httpserver.New(cfg.Host, cfg.Port, subsService, log)
 
 	return &App{
 		httpServer: server,

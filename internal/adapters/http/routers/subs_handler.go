@@ -1,16 +1,27 @@
 package routers
 
 import (
+	"errors"
+	"log/slog"
 	"net/http"
+	"submanager/internal/adapters/http/dto"
+	"submanager/internal/pkg/httputils"
+	"submanager/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SubsHandler handles subscription CRUDL routes.
-type SubsHandler struct{}
+type SubsHandler struct {
+	serv *service.SubsService
+	log  *slog.Logger
+}
 
-func NewSubsHandler() *SubsHandler {
-	return &SubsHandler{}
+func NewSubsHandler(serv *service.SubsService, log *slog.Logger) *SubsHandler {
+	return &SubsHandler{
+		serv: serv,
+		log:  log,
+	}
 }
 
 // RegisterSubsRoutes registers all subs http operations
@@ -18,15 +29,38 @@ func (h *SubsHandler) RegisterSubsRoutes(r *gin.RouterGroup) {
 	r.POST("/", h.CreateSubsHandler)
 	r.GET("/:user_id/:service_name", h.GetSubsHandler)
 	r.GET("/:user_id", h.ListSubsHandler)
+	r.GET("/summary")
 	r.PUT("/", h.UpdateSubsHandler)
 	r.DELETE("/:user_id/:service_name", h.DeleteSubsHandler)
 	r.DELETE("/:user_id", h.DeleteSubsListHandler)
 }
 
+var (
+	ErrInvalidJSON = errors.New("invalid JSON data")
+)
+
 // CreateSubsHandler creates a new subscription.
 func (h *SubsHandler) CreateSubsHandler(ctx *gin.Context) {
-	// TODO: Parse JSON body, validate, call service to create subscription
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Subscription created"})
+	subs, err := dto.GetSubsJSON(ctx)
+	if err != nil {
+		h.log.Error("Failed to bind subscription JSON request", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, ErrInvalidJSON)
+		return
+	}
+
+	if err := validateSubs(subs); err != nil {
+		h.log.Error("Failed to create subscription", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := h.serv.CreateSubscription(ctx.Request.Context(), subs); err != nil {
+		h.log.Error("Failed to create subscription", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	httputils.SendMessage(ctx, http.StatusCreated, "Subscription created")
 }
 
 // GetSubsHandler returns user subscription by specific service
@@ -34,28 +68,64 @@ func (h *SubsHandler) GetSubsHandler(ctx *gin.Context) {
 	userID := ctx.Param("user_id")
 	serviceName := ctx.Param("service_name")
 
-	// TODO: Validate userID, fetch subscription from DB/service by userID and serviceName
-	ctx.JSON(http.StatusOK, gin.H{
-		"user_id":      userID,
-		"service_name": serviceName,
-	})
+	if err := validateSubsParams(serviceName, userID); err != nil {
+		h.log.Error("Failed to get subscription", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	subs, err := h.serv.GetSubscription(ctx.Request.Context(), serviceName, userID)
+	if err != nil {
+		h.log.Error("Failed to get subscription", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, subs)
 }
 
 // ListSubsHandler returns user subscriptions list
 func (h *SubsHandler) ListSubsHandler(ctx *gin.Context) {
 	userID := ctx.Param("user_id")
 
-	// TODO: Validate userID, fetch all subscriptions for userID from DB/service
-	ctx.JSON(http.StatusOK, gin.H{
-		"user_id": userID,
-		"subs":    []string{},
-	})
+	if err := validateSubsParams("notempty", userID); err != nil {
+		h.log.Error("Failed to get subscription list", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	list, err := h.serv.GetSubscriptionList(ctx, userID)
+	if err != nil {
+		h.log.Error("Failed to get subscription list", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, list)
 }
 
 // UpdateSubsHandler updates subscription.
 func (h *SubsHandler) UpdateSubsHandler(ctx *gin.Context) {
-	// TODO: Parse JSON body, validate, call service to update subscription
-	ctx.JSON(http.StatusOK, gin.H{"message": "Subscription updated"})
+	subs, err := dto.GetSubsJSON(ctx)
+	if err != nil {
+		h.log.Error("Failed to bind subscription JSON request", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, ErrInvalidJSON)
+		return
+	}
+
+	if err := validateSubs(subs); err != nil {
+		h.log.Error("Failed to update subscription", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := h.serv.UpdateSubscription(ctx, subs); err != nil {
+		h.log.Error("Failed to update subscription", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	httputils.SendMessage(ctx, http.StatusOK, "Subscription updated")
 }
 
 // DeleteSubsHandler deletes user subscription by specific service
@@ -63,21 +133,41 @@ func (h *SubsHandler) DeleteSubsHandler(ctx *gin.Context) {
 	userID := ctx.Param("user_id")
 	serviceName := ctx.Param("service_name")
 
-	// TODO: Validate, call service to delete specific subscription
-	ctx.JSON(http.StatusOK, gin.H{
-		"message":      "Subscription deleted",
-		"user_id":      userID,
-		"service_name": serviceName,
-	})
+	if err := validateSubsParams(serviceName, userID); err != nil {
+		h.log.Error("Failed to delete subscription", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := h.serv.DeleteSubscription(ctx, serviceName, userID); err != nil {
+		h.log.Error("Failed to delete subscription", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	httputils.SendMessage(ctx, http.StatusOK, "Subscription deleted")
 }
 
 // DeleteSubsListHandler deletes all user subscriptions
 func (h *SubsHandler) DeleteSubsListHandler(ctx *gin.Context) {
 	userID := ctx.Param("user_id")
 
-	// TODO: Validate, call service to delete all subscriptions for userID
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "All subscriptions deleted",
-		"user_id": userID,
-	})
+	if err := validateSubsParams("notempty", userID); err != nil {
+		h.log.Error("Failed to get subscription list", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := h.serv.DeleteSubscriptionList(ctx, userID); err != nil {
+		h.log.Error("Failed to delete subscription list", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	httputils.SendMessage(ctx, http.StatusOK, "All user subscriptions deleted")
+}
+
+func (h *SubsHandler) SummaryHandler(ctx *gin.Context) {
+
+	ctx.JSON(http.StatusOK, gin.H{})
 }

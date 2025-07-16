@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"submanager/internal/adapters/http/routers"
+	"submanager/internal/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,7 @@ type API struct {
 	server *http.Server
 }
 
-func New(host, port string, log *slog.Logger) *API {
+func New(host, port string, subsService *service.SubsService, log *slog.Logger) *API {
 	r := gin.New()
 	SetSwagger(r)
 
@@ -32,7 +33,7 @@ func New(host, port string, log *slog.Logger) *API {
 		)
 	})
 
-	subsHandler := routers.NewSubsHandler()
+	subsHandler := routers.NewSubsHandler(subsService, log)
 	subsHandler.RegisterSubsRoutes(r.Group("/subs"))
 
 	return &API{

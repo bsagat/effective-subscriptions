@@ -8,7 +8,7 @@ import (
 func main() {
 	cfg := app.MustParseConfig()
 
-	log := logger.New(cfg.LogFilePath, cfg.LogLevel)
+	log := logger.New(cfg.LogLevel)
 	log.Info("Logger setup finished")
 
 	application := app.New(cfg, log)

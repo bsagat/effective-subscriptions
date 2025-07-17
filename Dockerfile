@@ -2,13 +2,15 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
+
+COPY docs/swagger.json docs/swagger.json
 
 RUN go mod download
 
-COPY . .
+RUN go build -o submanager cmd/main.go
 
-RUN go build -ldflags="-w -s" -o submanager .
+CMD ["./submanager"]
 
 # Final stage
 FROM alpine:latest
@@ -16,6 +18,7 @@ FROM alpine:latest
 WORKDIR /root/
 
 COPY --from=builder /app/submanager .
-COPY .env .env  
+COPY .env .env
+COPY docs/swagger.json docs/swagger.json
 
 CMD ["./submanager"]

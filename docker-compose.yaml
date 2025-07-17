@@ -1,6 +1,13 @@
 services:
-  # SubManager:
-
+  submanager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      SubManagerDb:
+        condition: service_healthy
   SubManagerDb:
     image: postgres:16.3
     environment:
@@ -12,7 +19,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     healthcheck:
-      test: ["CMD-SHELL", "psql_isready -U ${POSTGRES_USER} -d ${POSTGRES_NAME} "]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} "]
       interval: 5s
       timeout: 5s
       retries: 5

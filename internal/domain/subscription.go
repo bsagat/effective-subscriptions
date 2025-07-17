@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Subscription struct {
 	ServiceName string    `json:"service_name"`
@@ -8,4 +10,10 @@ type Subscription struct {
 	UserID      string    `json:"user_id"`
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
+}
+
+type Summary struct {
+	TotalPrice    int            `json:"total_price"`
+	SubsCount     int            `json:"total_subscriptions"`
+	Subscriptions []Subscription `json:"subscriptions"`
 }

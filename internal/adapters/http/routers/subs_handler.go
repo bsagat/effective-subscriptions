@@ -29,7 +29,7 @@ func (h *SubsHandler) RegisterSubsRoutes(r *gin.RouterGroup) {
 	r.POST("/", h.CreateSubsHandler)
 	r.GET("/:user_id/:service_name", h.GetSubsHandler)
 	r.GET("/:user_id", h.ListSubsHandler)
-	r.GET("/summary")
+	r.GET("/summary", h.SummaryHandler)
 	r.PUT("/", h.UpdateSubsHandler)
 	r.DELETE("/:user_id/:service_name", h.DeleteSubsHandler)
 	r.DELETE("/:user_id", h.DeleteSubsListHandler)
@@ -168,6 +168,19 @@ func (h *SubsHandler) DeleteSubsListHandler(ctx *gin.Context) {
 }
 
 func (h *SubsHandler) SummaryHandler(ctx *gin.Context) {
+	summQuery, err := dto.GetSummaryQuery(ctx)
+	if err != nil {
+		h.log.Error("Failed to get summary queries", "error", err)
+		httputils.SendError(ctx, http.StatusBadRequest, err)
+		return
+	}
 
-	ctx.JSON(http.StatusOK, gin.H{})
+	summResp, err := h.serv.GetSummaryByFilter(ctx, summQuery.Start, summQuery.End, summQuery.ServiceName, summQuery.UserID)
+	if err != nil {
+		h.log.Error("Failed to get summary by filter", "error", err)
+		httputils.SendError(ctx, httputils.GetStatus(err), err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, summResp)
 }

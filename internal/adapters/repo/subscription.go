@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"submanager/internal/domain"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -146,4 +147,50 @@ func (repo *SubsRepo) DeleteList(ctx context.Context, userID string) error {
 		return domain.ErrSubsNotFound
 	}
 	return nil
+}
+
+func (repo *SubsRepo) SubsListByFilter(ctx context.Context, start, end time.Time, serviceName, userID string) ([]domain.Subscription, error) {
+	const op = "SubsRepo.SubsListByFilter"
+	query := `
+		SELECT Service_name, Price, User_ID, Start_date, Exp_date FROM Subscriptions
+		WHERE Start_date BETWEEN $1 and $2 `
+
+	// Add filters and args dynamically
+	args := []any{start, end}
+	switch {
+	case len(serviceName) != 0:
+		query += `AND Service_name = $3 `
+		args = append(args, serviceName)
+		if len(userID) != 0 {
+			query += `AND User_ID = $4 `
+			args = append(args, userID)
+		}
+	case len(userID) != 0:
+		query += `AND User_ID = $3 `
+		args = append(args, userID)
+	}
+
+	rows, err := repo.db.Query(ctx, query, args...)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrSubsNotFound
+		}
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	var subsList []domain.Subscription
+	for rows.Next() {
+		var subs domain.Subscription
+		if err := rows.Scan(&subs.ServiceName, &subs.Price, &subs.UserID, &subs.StartDate, &subs.EndDate); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+		subsList = append(subsList, subs)
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("%s: %w", op, rows.Err())
+	}
+
+	return subsList, nil
 }

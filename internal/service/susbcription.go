@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"submanager/internal/adapters/repo"
 	"submanager/internal/domain"
+	"time"
 )
 
 type SubsService struct {
@@ -48,7 +49,7 @@ func (s *SubsService) CreateSubscription(ctx context.Context, subs domain.Subscr
 
 	// Create a new subscription in the database
 	if err := s.repo.Create(ctx, subs); err != nil {
-		log.Error("Failed to create new subs in DB", "error", err)
+		log.Error("Failed to create new subs", "error", err)
 		return err
 	}
 
@@ -152,4 +153,42 @@ func (s *SubsService) DeleteSubscriptionList(ctx context.Context, userID string)
 
 	log.Info("Subscription list has been deleted")
 	return nil
+}
+
+func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Time, serviceName, userID string) (domain.Summary, error) {
+	const op = "SubsService.GetSummaryByFilter"
+	log := s.log.With(
+		slog.String("op", op),
+		slog.String("service_name", serviceName),
+		slog.String("user_id", userID),
+		slog.String("filter_start_date", start.String()),
+		slog.String("filter_end_date", end.String()),
+	)
+
+	subs, err := s.repo.SubsListByFilter(ctx, start, end, serviceName, userID)
+	if err != nil {
+		log.Error("Failed to get subs list by filter", "error", err)
+		return domain.Summary{}, err
+	}
+
+	if len(subs) == 0 {
+		log.Error("Subscription list is empty")
+		return domain.Summary{}, domain.ErrSubsNotFound
+	}
+
+	summary := domain.Summary{
+		TotalPrice:    getSummary(subs),
+		SubsCount:     len(subs),
+		Subscriptions: subs,
+	}
+	log.Info("Subscription list summary has been calculated successfully", "subs_count", summary.SubsCount, "total_price", summary.TotalPrice)
+	return summary, nil
+}
+
+func getSummary(subsList []domain.Subscription) int {
+	var total int
+	for _, sub := range subsList {
+		total += sub.Price
+	}
+	return total
 }

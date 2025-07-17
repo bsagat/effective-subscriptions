@@ -569,11 +569,11 @@
         "properties": {
           "total_price": {
             "type": "integer",
-            "example": 2400
+            "example": 400
           },
           "total_subscriptions": {
             "type": "integer",
-            "example": 6
+            "example": 1
           },
           "subscriptions": {
             "$ref": "#/components/schemas/Subscriptions"

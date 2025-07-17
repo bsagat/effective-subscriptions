@@ -11,6 +11,7 @@ const (
 	dev   = "dev"
 )
 
+// New creates a new logger instance with the specified log file path and level.
 func New(logFilePath string, level string) *slog.Logger {
 	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {

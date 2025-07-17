@@ -16,6 +16,8 @@ type subsReq struct {
 	EndDate     string `json:"end_date"`
 }
 
+// GetSubsJSON extracts subscription data from the request context.
+// It returns a domain.Subscription object or an error if the data is invalid.
 func GetSubsJSON(ctx *gin.Context) (domain.Subscription, error) {
 	var (
 		subsReq subsReq
@@ -54,6 +56,8 @@ type SummaryQueries struct {
 	UserID      string
 }
 
+// GetSummaryQuery extracts summary query parameters from the request context.
+// It returns a SummaryQueries struct or an error if required parameters are missing or invalid.
 func GetSummaryQuery(ctx *gin.Context) (SummaryQueries, error) {
 	var (
 		sumQuery SummaryQueries

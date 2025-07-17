@@ -38,12 +38,18 @@ type SubsChecker interface {
 	IsUnique(ctx context.Context, serviceName string, userID string) (bool, error)
 }
 
+// ---------------- Subs Service ----------------
+
 type SubsService interface {
 	CreateSubscription(ctx context.Context, subs Subscription) error
 	DeleteSubscription(ctx context.Context, serviceName string, userID string) error
 	DeleteSubscriptionList(ctx context.Context, userID string) error
 	GetSubscription(ctx context.Context, serviceName string, userID string) (Subscription, error)
 	GetSubscriptionList(ctx context.Context, userID string) ([]Subscription, error)
-	GetSummaryByFilter(ctx context.Context, start time.Time, end time.Time, serviceName string, userID string) (Summary, error)
 	UpdateSubscription(ctx context.Context, subs Subscription) error
+	SummaryService
+}
+
+type SummaryService interface {
+	GetSummaryByFilter(ctx context.Context, start time.Time, end time.Time, serviceName string, userID string) (Summary, error)
 }

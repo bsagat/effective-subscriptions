@@ -82,18 +82,16 @@ func (repo *SubsRepo) List(ctx context.Context, userID string) ([]domain.Subscri
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-	defer rows.Close()
 
-	var subsList []domain.Subscription
-	for rows.Next() {
+	subsList, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (domain.Subscription, error) {
 		var subs domain.Subscription
-		if err := rows.Scan(&subs.ServiceName, &subs.Price, &subs.UserID, &subs.StartDate, &subs.EndDate); err != nil {
-			return nil, fmt.Errorf("%s: %w", op, err)
+		if err := row.Scan(&subs.ServiceName, &subs.Price, &subs.UserID, &subs.StartDate, &subs.EndDate); err != nil {
+			return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
 		}
-		subsList = append(subsList, subs)
-	}
+		return subs, nil
+	})
 
-	if rows.Err() != nil {
+	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, rows.Err())
 	}
 
@@ -177,19 +175,16 @@ func (repo *SubsRepo) SubsListByFilter(ctx context.Context, start, end time.Time
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-	defer rows.Close()
 
-	var subsList []domain.Subscription
-	for rows.Next() {
+	subsList, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (domain.Subscription, error) {
 		var subs domain.Subscription
-		if err := rows.Scan(&subs.ServiceName, &subs.Price, &subs.UserID, &subs.StartDate, &subs.EndDate); err != nil {
-			return nil, fmt.Errorf("%s: %w", op, err)
+		if err := row.Scan(&subs.ServiceName, &subs.Price, &subs.UserID, &subs.StartDate, &subs.EndDate); err != nil {
+			return domain.Subscription{}, fmt.Errorf("%s: %w", op, err)
 		}
-		subsList = append(subsList, subs)
-	}
-
-	if rows.Err() != nil {
-		return nil, fmt.Errorf("%s: %w", op, rows.Err())
+		return subs, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return subsList, nil

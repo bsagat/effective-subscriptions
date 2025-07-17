@@ -162,6 +162,7 @@ func (h *SubsHandler) DeleteSubsListHandler(ctx *gin.Context) {
 	httputils.SendMessage(ctx, http.StatusOK, "All user subscriptions deleted")
 }
 
+// SummaryHandler retrieves a summary of subscriptions based on the filter.
 func (h *SubsHandler) SummaryHandler(ctx *gin.Context) {
 	summQuery, err := dto.GetSummaryQuery(ctx)
 	if err != nil {

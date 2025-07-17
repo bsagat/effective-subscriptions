@@ -19,6 +19,8 @@ var (
 	equal        byte = '='
 )
 
+// Loads environment variables from the specified files.
+// If no files are specified, it defaults to loading from ".env".
 func Loader(filepaths ...string) error {
 	if len(filepaths) == 0 {
 		filepaths = []string{".env"}
@@ -38,6 +40,7 @@ func Loader(filepaths ...string) error {
 	return nil
 }
 
+// Sets environment variables from the provided map.
 func setVariables(m map[string]string) error {
 	for key, value := range m {
 		if err := os.Setenv(key, value); err != nil {
@@ -47,6 +50,7 @@ func setVariables(m map[string]string) error {
 	return nil
 }
 
+// Loads environment variables from a file and returns them as a map.
 func load(filePath string) (map[string]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -62,6 +66,7 @@ func load(filePath string) (map[string]string, error) {
 	return BytesParser(bytes), nil
 }
 
+// BytesParser parses environment variables from a byte slice.
 func BytesParser(raw []byte) map[string]string {
 	var key, value, empty []byte
 	var isKeyAdded, isCommented bool
@@ -74,7 +79,7 @@ func BytesParser(raw []byte) map[string]string {
 			value = bytes.TrimSpace(value)
 			key = bytes.TrimSpace(key)
 
-			// Проверка на двойные скобки
+			// Handle double quotes around values
 			if len(value) >= 2 {
 				if value[0] == doublequotes && value[len(value)-1] == doublequotes {
 					if len(value) == 2 {

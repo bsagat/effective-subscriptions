@@ -19,6 +19,7 @@ type DBConfig struct {
 	Password string `env:"POSTGRES_PASSWORD"`
 }
 
+// Connects to the PostgreSQL database using the provided configuration.
 func Connect(dbCfg DBConfig) (*API, error) {
 	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
 		dbCfg.UserName, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.Name)
@@ -36,6 +37,7 @@ func Connect(dbCfg DBConfig) (*API, error) {
 	}, nil
 }
 
+// Closes the database connection gracefully.
 func (a *API) Close(ctx context.Context) error {
 	return a.DB.Close(ctx)
 }

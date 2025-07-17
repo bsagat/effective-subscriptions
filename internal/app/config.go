@@ -17,6 +17,7 @@ type (
 	}
 )
 
+// MustParseConfig loads and parses the configuration from environment variables.
 func MustParseConfig() Config {
 	if err := envzilla.Loader(".env"); err != nil {
 		slog.Error("Failed to load configuration", "error", err)

@@ -20,6 +20,7 @@ type App struct {
 	log *slog.Logger
 }
 
+// Setup application with adapters and logger
 func New(cfg Config, log *slog.Logger) *App {
 	log.Info("Connecting to database...")
 	postgresDB, err := postgres.Connect(cfg.DB)
@@ -40,6 +41,7 @@ func New(cfg Config, log *slog.Logger) *App {
 	}
 }
 
+// Start the application, which includes starting the HTTP server and handling graceful shutdown
 func (a *App) Start() {
 	go a.httpServer.StartServer()
 	defer a.CleanUp()
@@ -53,6 +55,7 @@ func (a *App) Start() {
 	a.log.Info("Shutting down server")
 }
 
+// CleanUp closes the HTTP server and database connection gracefully
 func (a *App) CleanUp() {
 	if err := a.httpServer.Close(); err != nil {
 		a.log.Error("Failed to close server...")

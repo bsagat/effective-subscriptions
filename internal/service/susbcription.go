@@ -19,6 +19,8 @@ func NewSubsService(repo domain.SubsRepo, log *slog.Logger) *SubsService {
 	}
 }
 
+// CreateSubscription creates a new subscription in the database.
+// It checks if the subscription is unique and sets the expiration date if not provided.
 func (s *SubsService) CreateSubscription(ctx context.Context, subs domain.Subscription) error {
 	const op = "SubsService.CreateSubscription"
 	log := s.log.With(
@@ -56,6 +58,7 @@ func (s *SubsService) CreateSubscription(ctx context.Context, subs domain.Subscr
 	return nil
 }
 
+// GetSubscription retrieves a subscription by service name and user ID.
 func (s *SubsService) GetSubscription(ctx context.Context, serviceName, userID string) (domain.Subscription, error) {
 	const op = "SubsService.GetSubscription"
 	log := s.log.With(
@@ -74,6 +77,7 @@ func (s *SubsService) GetSubscription(ctx context.Context, serviceName, userID s
 	return subs, nil
 }
 
+// GetSubscriptionList retrieves all subscriptions for a given user ID.
 func (s *SubsService) GetSubscriptionList(ctx context.Context, userID string) ([]domain.Subscription, error) {
 	const op = "SubsService.GetSubscriptionList"
 	log := s.log.With(
@@ -96,6 +100,7 @@ func (s *SubsService) GetSubscriptionList(ctx context.Context, userID string) ([
 	return subs, nil
 }
 
+// UpdateSubscription updates an existing subscription in the database.
 func (s *SubsService) UpdateSubscription(ctx context.Context, subs domain.Subscription) error {
 	const op = "SubsService.UpdateSubs"
 	log := s.log.With(
@@ -121,6 +126,7 @@ func (s *SubsService) UpdateSubscription(ctx context.Context, subs domain.Subscr
 	return nil
 }
 
+// DeleteSubscription deletes a subscription by service name and user ID.
 func (s *SubsService) DeleteSubscription(ctx context.Context, serviceName, userID string) error {
 	const op = "SubsService.DeleteSubscription"
 	log := s.log.With(
@@ -138,6 +144,7 @@ func (s *SubsService) DeleteSubscription(ctx context.Context, serviceName, userI
 	return nil
 }
 
+// DeleteSubscriptionList deletes all subscriptions for a given user ID.
 func (s *SubsService) DeleteSubscriptionList(ctx context.Context, userID string) error {
 	const op = "SubsService.DeleteSubscription"
 	log := s.log.With(
@@ -154,6 +161,8 @@ func (s *SubsService) DeleteSubscriptionList(ctx context.Context, userID string)
 	return nil
 }
 
+// GetSummaryByFilter retrieves a summary of subscriptions based on the provided filter criteria.
+// It returns the total price, count of subscriptions, and the list of subscriptions.
 func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Time, serviceName, userID string) (domain.Summary, error) {
 	const op = "SubsService.GetSummaryByFilter"
 	log := s.log.With(

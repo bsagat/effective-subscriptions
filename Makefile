@@ -1,11 +1,6 @@
 ## Database DSN from .env.example
 DB_URL=postgres://Admin:SuperSecretPassword@localhost:5432/SubManagerDB?sslmode=disable
 
-## Creates a new migration
-migrate-create:
-	@echo "Creating new migration: $(name)"
-	migrate create -seq -ext=.sql -dir=./migrations $(name)
-
 ## Apply all migrations
 migrate-up:
 	migrate -path=./migrations -database "$(DB_URL)" up
@@ -14,6 +9,24 @@ migrate-up:
 migrate-down:
 	migrate -path=./migrations -database "$(DB_URL)" down
 
-## View the current version of migrations
+## Show current migration version
 migrate-version:
 	migrate -path=./migrations -database "$(DB_URL)" version
+
+## Build and run docker-compose with rebuild
+up:
+	docker-compose up --build
+	migrate -path=./migrations -database "$(DB_URL)" up
+
+## Stop and remove containers and volumes
+down:
+	docker-compose down -v
+
+## View logs
+logs:
+	docker-compose logs -f
+
+## Run unit tests
+test:
+	go test ./... -v
+

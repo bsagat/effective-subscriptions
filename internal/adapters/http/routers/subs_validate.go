@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"errors"
 	"fmt"
 	"submanager/internal/domain"
 	"unicode"
@@ -23,11 +22,11 @@ func validateSubs(subs domain.Subscription) error {
 	}
 
 	if subs.Price <= 0 {
-		return fmt.Errorf("price field must be more than 0")
+		return domain.ErrPriceField
 	}
 
 	if !IsValidUUID(subs.UserID) {
-		return errors.New("user_ID is not UUID format")
+		return domain.ErrInvalidUserID
 	}
 	return nil
 }
@@ -40,7 +39,7 @@ func validateSubsParams(serviceName, userID string) error {
 	}
 
 	if !IsValidUUID(userID) {
-		return errors.New("user_ID is not UUID format")
+		return domain.ErrInvalidUserID
 	}
 
 	if len(serviceName) == 0 {

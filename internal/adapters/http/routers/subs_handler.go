@@ -1,23 +1,22 @@
 package routers
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 	"submanager/internal/adapters/http/dto"
+	"submanager/internal/domain"
 	"submanager/internal/pkg/httputils"
-	"submanager/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SubsHandler handles subscription CRUDL routes.
 type SubsHandler struct {
-	serv *service.SubsService
+	serv domain.SubsService
 	log  *slog.Logger
 }
 
-func NewSubsHandler(serv *service.SubsService, log *slog.Logger) *SubsHandler {
+func NewSubsHandler(serv domain.SubsService, log *slog.Logger) *SubsHandler {
 	return &SubsHandler{
 		serv: serv,
 		log:  log,
@@ -35,16 +34,12 @@ func (h *SubsHandler) RegisterSubsRoutes(r *gin.RouterGroup) {
 	r.DELETE("/:user_id", h.DeleteSubsListHandler)
 }
 
-var (
-	ErrInvalidJSON = errors.New("invalid JSON data")
-)
-
 // CreateSubsHandler creates a new subscription.
 func (h *SubsHandler) CreateSubsHandler(ctx *gin.Context) {
 	subs, err := dto.GetSubsJSON(ctx)
 	if err != nil {
 		h.log.Error("Failed to bind subscription JSON request", "error", err)
-		httputils.SendError(ctx, http.StatusBadRequest, ErrInvalidJSON)
+		httputils.SendError(ctx, http.StatusBadRequest, domain.ErrInvalidJSON)
 		return
 	}
 
@@ -109,7 +104,7 @@ func (h *SubsHandler) UpdateSubsHandler(ctx *gin.Context) {
 	subs, err := dto.GetSubsJSON(ctx)
 	if err != nil {
 		h.log.Error("Failed to bind subscription JSON request", "error", err)
-		httputils.SendError(ctx, http.StatusBadRequest, ErrInvalidJSON)
+		httputils.SendError(ctx, http.StatusBadRequest, domain.ErrInvalidJSON)
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"submanager/internal/adapters/http/routers"
-	"submanager/internal/service"
+	"submanager/internal/domain"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ type API struct {
 	server *http.Server
 }
 
-func New(host, port string, subsService *service.SubsService, log *slog.Logger) *API {
+func New(host, port string, subsService domain.SubsService, log *slog.Logger) *API {
 	r := gin.New()
 	SetSwagger(r)
 

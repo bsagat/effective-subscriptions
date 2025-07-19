@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	httpserver "submanager/internal/adapters/http"
 	"submanager/internal/adapters/repo"
+	"submanager/internal/pkg/logger"
 	"submanager/internal/pkg/postgres"
 	"submanager/internal/service"
 	"syscall"
@@ -17,11 +17,11 @@ type App struct {
 	httpServer *httpserver.API
 	postgresDB *postgres.API
 
-	log *slog.Logger
+	log logger.Logger
 }
 
 // Setup application with adapters and logger
-func New(cfg Config, log *slog.Logger) *App {
+func New(cfg Config, log logger.Logger) *App {
 	log.Info("Connecting to database...")
 	postgresDB, err := postgres.Connect(cfg.DB)
 	if err != nil {

@@ -1,11 +1,11 @@
 package routers
 
 import (
-	"log/slog"
 	"net/http"
 	"submanager/internal/adapters/http/dto"
 	"submanager/internal/domain"
 	"submanager/internal/pkg/httputils"
+	"submanager/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,10 +13,10 @@ import (
 // SubsHandler handles subscription CRUDL routes.
 type SubsHandler struct {
 	serv domain.SubsService
-	log  *slog.Logger
+	log  logger.Logger
 }
 
-func NewSubsHandler(serv domain.SubsService, log *slog.Logger) *SubsHandler {
+func NewSubsHandler(serv domain.SubsService, log logger.Logger) *SubsHandler {
 	return &SubsHandler{
 		serv: serv,
 		log:  log,

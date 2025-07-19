@@ -4,15 +4,16 @@ import (
 	"context"
 	"log/slog"
 	"submanager/internal/domain"
+	"submanager/internal/pkg/logger"
 	"time"
 )
 
 type SubsService struct {
 	repo domain.SubsRepo
-	log  *slog.Logger
+	log  logger.Logger
 }
 
-func NewSubsService(repo domain.SubsRepo, log *slog.Logger) *SubsService {
+func NewSubsService(repo domain.SubsRepo, log logger.Logger) *SubsService {
 	return &SubsService{
 		repo: repo,
 		log:  log,

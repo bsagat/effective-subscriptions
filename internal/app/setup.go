@@ -30,13 +30,6 @@ func New(cfg Config, log *slog.Logger) *App {
 	}
 	log.Info("Database connection estabilished...")
 
-	log.Info("Running migrations...")
-	if err := postgresDB.Migrate(); err != nil {
-		log.Error("Failed to run migrations", "error", err)
-		os.Exit(1)
-	}
-	log.Info("Migrations finished...")
-
 	subsRepo := repo.NewSubsRepo(postgresDB.DB)
 	subsService := service.NewSubsService(subsRepo, log)
 	server := httpserver.New(cfg.Host, cfg.Port, subsService, log)

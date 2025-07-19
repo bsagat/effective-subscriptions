@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"submanager/internal/domain"
+	"submanager/internal/pkg/logger"
 	"submanager/internal/service"
 	mock "submanager/tests/mocks"
 	"testing"
@@ -20,7 +21,7 @@ func TestMain(m *testing.M) {
 
 	// Initialize the mock repository and service
 	repo := mock.NewMockSubsRepo()
-	log := slog.Default()
+	log := logger.New(logger.Debug)
 	serv = service.NewSubsService(repo, log)
 
 	defer os.Exit(m.Run())

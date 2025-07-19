@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	debug = "debug"
-	prod  = "prod"
-	dev   = "dev"
+	Debug = "debug"
+	Prod  = "prod"
+	Dev   = "dev"
 )
 
 type Logger interface {
@@ -54,15 +54,15 @@ func (l *slogLogger) Log(ctx context.Context, level slog.Level, msg string, args
 func New(level string) Logger {
 	var slogger *slog.Logger
 	switch level {
-	case debug:
+	case Debug:
 		slogger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
 		}))
-	case prod:
+	case Prod:
 		slogger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		}))
-	case dev:
+	case Dev:
 		slogger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
 		}))

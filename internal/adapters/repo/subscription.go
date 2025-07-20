@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type SubsRepo struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewSubsRepo(db *pgx.Conn) *SubsRepo {
+func NewSubsRepo(db *pgxpool.Pool) *SubsRepo {
 	return &SubsRepo{
 		db: db,
 	}

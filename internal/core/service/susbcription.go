@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"log/slog"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"submanager/internal/pkg/logger"
 	"time"
 )

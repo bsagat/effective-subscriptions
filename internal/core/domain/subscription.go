@@ -16,6 +16,6 @@ type Summary struct {
 	TotalPrice    int            `json:"total_price"`
 	SubsCount     int            `json:"total_subscriptions"`
 	PageNumber    int            `json:"page_number"`
-	PageSize      int            `json:"page_size"`
+	PageSize      int            `json:"max_page_size"`
 	Subscriptions []Subscription `json:"subscriptions"`
 }

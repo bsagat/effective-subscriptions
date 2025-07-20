@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"submanager/internal/adapters/http/routers"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"submanager/internal/pkg/logger"
 	"time"
 

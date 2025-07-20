@@ -3,7 +3,7 @@ package routers
 import (
 	"net/http"
 	"submanager/internal/adapters/http/dto"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"submanager/internal/pkg/httputils"
 	"submanager/internal/pkg/logger"
 

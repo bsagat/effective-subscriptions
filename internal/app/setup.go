@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	httpserver "submanager/internal/adapters/http"
 	"submanager/internal/adapters/repo"
+	"submanager/internal/core/service"
 	"submanager/internal/pkg/logger"
 	"submanager/internal/pkg/postgres"
-	"submanager/internal/service"
 	"syscall"
 )
 
@@ -22,15 +22,17 @@ type App struct {
 
 // Setup application with adapters and logger
 func New(cfg Config, log logger.Logger) *App {
+	ctx := context.Background()
+
 	log.Info("Connecting to database...")
-	postgresDB, err := postgres.Connect(cfg.DB)
+	postgresDB, err := postgres.Connect(ctx, cfg.DB)
 	if err != nil {
 		log.Error("Failed to connect postgres server", "error", err)
 		os.Exit(1)
 	}
 	log.Info("Database connection estabilished...")
 
-	subsRepo := repo.NewSubsRepo(postgresDB.DB)
+	subsRepo := repo.NewSubsRepo(postgresDB.Pool)
 	subsService := service.NewSubsService(subsRepo, log)
 	server := httpserver.New(cfg.Host, cfg.Port, subsService, log)
 
@@ -61,7 +63,5 @@ func (a *App) CleanUp() {
 		a.log.Error("Failed to close server...")
 	}
 
-	if err := a.postgresDB.Close(context.Background()); err != nil {
-		a.log.Error("Failed to close database...")
-	}
+	a.postgresDB.Close()
 }

@@ -2,7 +2,7 @@ package httputils
 
 import (
 	"net/http"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 
 	"github.com/gin-gonic/gin"
 )

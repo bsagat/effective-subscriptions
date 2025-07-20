@@ -3,41 +3,57 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type API struct {
-	DB *pgx.Conn
+	Pool *pgxpool.Pool
 }
 
 type DBConfig struct {
-	Host     string `env:"POSTGRES_HOST"`
-	Port     string `env:"POSTGRES_PORT"`
-	Name     string `env:"POSTGRES_DB"`
-	UserName string `env:"POSTGRES_USER"`
-	Password string `env:"POSTGRES_PASSWORD"`
+	Host           string        `env:"POSTGRES_HOST"`
+	Port           string        `env:"POSTGRES_PORT"`
+	Name           string        `env:"POSTGRES_DB"`
+	UserName       string        `env:"POSTGRES_USER"`
+	Password       string        `env:"POSTGRES_PASSWORD"`
+	MaxConnections int32         `env:"POSTGRES_MAX_CONNS" default:"10"`
+	ConnTimeout    time.Duration `env:"POSTGRES_CONN_TIMEOUT" default:"5s"`
 }
 
-// Connects to the PostgreSQL database using the provided configuration.
-func Connect(dbCfg DBConfig) (*API, error) {
-	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+// Connect connects to the PostgreSQL database using the provided configuration.
+func Connect(ctx context.Context, dbCfg DBConfig) (*API, error) {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		dbCfg.UserName, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.Name)
-	pool, err := pgx.Connect(context.Background(), connStr)
+
+	cfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("pgxpool.ParseConfig: %w", err)
 	}
 
-	if err := pool.Ping(context.Background()); err != nil {
-		return nil, err
+	cfg.MaxConns = dbCfg.MaxConnections
+	cfg.MaxConnLifetime = time.Hour
+	cfg.HealthCheckPeriod = time.Minute
+
+	ctx, cancel := context.WithTimeout(ctx, dbCfg.ConnTimeout)
+	defer cancel()
+
+	pool, err := pgxpool.NewWithConfig(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("pgxpool.NewWithConfig: %w", err)
+	}
+
+	if err := pool.Ping(ctx); err != nil {
+		return nil, fmt.Errorf("ping database: %w", err)
 	}
 
 	return &API{
-		DB: pool,
+		Pool: pool,
 	}, nil
 }
 
-// Closes the database connection gracefully.
-func (a *API) Close(ctx context.Context) error {
-	return a.DB.Close(ctx)
+// Close closes the database connection gracefully.
+func (a *API) Close() {
+	a.Pool.Close()
 }

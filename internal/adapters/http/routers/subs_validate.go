@@ -2,7 +2,7 @@ package routers
 
 import (
 	"fmt"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"unicode"
 )
 
@@ -29,7 +29,7 @@ func validateSubs(subs domain.Subscription) error {
 		return domain.ErrInvalidUserID
 	}
 
-	if subs.StartDate.Before(subs.EndDate) {
+	if subs.StartDate.After(subs.EndDate) {
 		return domain.ErrInvalidDate
 	}
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"time"
 
 	"github.com/gin-gonic/gin"

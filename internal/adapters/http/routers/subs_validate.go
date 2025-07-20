@@ -28,6 +28,11 @@ func validateSubs(subs domain.Subscription) error {
 	if !IsValidUUID(subs.UserID) {
 		return domain.ErrInvalidUserID
 	}
+
+	if subs.StartDate.Before(subs.EndDate) {
+		return domain.ErrInvalidDate
+	}
+
 	return nil
 }
 

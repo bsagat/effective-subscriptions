@@ -31,7 +31,7 @@ type SubsDeleter interface {
 type SubsGetter interface {
 	Get(ctx context.Context, serviceName string, userID string) (Subscription, error)
 	List(ctx context.Context, userID string) ([]Subscription, error)
-	SubsListByFilter(ctx context.Context, start time.Time, end time.Time, serviceName string, userID string) ([]Subscription, error)
+	SubsListByFilter(ctx context.Context, start time.Time, end time.Time, serviceName, userID string, pageNum, pageSize int) ([]Subscription, error)
 }
 
 type SubsChecker interface {
@@ -51,5 +51,5 @@ type SubsService interface {
 }
 
 type SummaryService interface {
-	GetSummaryByFilter(ctx context.Context, start time.Time, end time.Time, serviceName string, userID string) (Summary, error)
+	GetSummaryByFilter(ctx context.Context, start time.Time, end time.Time, serviceName, userID string, pageNum, pageSize int) (Summary, error)
 }

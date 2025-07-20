@@ -164,7 +164,7 @@ func (s *SubsService) DeleteSubscriptionList(ctx context.Context, userID string)
 
 // GetSummaryByFilter retrieves a summary of subscriptions based on the provided filter criteria.
 // It returns the total price, count of subscriptions, and the list of subscriptions.
-func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Time, serviceName, userID string) (domain.Summary, error) {
+func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Time, serviceName, userID string, pageNum, pageSize int) (domain.Summary, error) {
 	const op = "SubsService.GetSummaryByFilter"
 	log := s.log.With(
 		slog.String("op", op),
@@ -172,9 +172,11 @@ func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Ti
 		slog.String("user_id", userID),
 		slog.String("filter_start_date", start.String()),
 		slog.String("filter_end_date", end.String()),
+		slog.Int("page_number", pageNum),
+		slog.Int("page_size", pageSize),
 	)
 
-	subs, err := s.repo.SubsListByFilter(ctx, start, end, serviceName, userID)
+	subs, err := s.repo.SubsListByFilter(ctx, start, end, serviceName, userID, pageNum, pageSize)
 	if err != nil {
 		log.Error("Failed to get subs list by filter", "error", err)
 		return domain.Summary{}, err
@@ -188,9 +190,11 @@ func (s *SubsService) GetSummaryByFilter(ctx context.Context, start, end time.Ti
 	summary := domain.Summary{
 		TotalPrice:    getSummary(subs),
 		SubsCount:     len(subs),
+		PageNumber:    pageNum,
+		PageSize:      pageSize,
 		Subscriptions: subs,
 	}
-	log.Info("Subscription list summary has been calculated successfully", "subs_count", summary.SubsCount, "total_price", summary.TotalPrice)
+	log.Info("Subscription list summary has been calculated successfully", "subs_count", summary.SubsCount, "total_price", summary.TotalPrice, "page_number", summary.PageNumber, "page_size", summary.PageSize)
 	return summary, nil
 }
 

@@ -146,14 +146,14 @@ func TestGetSummaryByFilter(t *testing.T) {
 	ctx := context.Background()
 
 	// Default test case
-	start, end, serviceName, userID := time.Now(), time.Now(), "TestService", "user123"
-	if _, err := serv.GetSummaryByFilter(ctx, start, end, serviceName, userID); err != nil {
+	start, end, serviceName, userID, pageNum, pageSize := time.Now(), time.Now(), "TestService", "user123", 1, 10
+	if _, err := serv.GetSummaryByFilter(ctx, start, end, serviceName, userID, pageNum, pageSize); err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
 	// Check if subscription not found
 	serviceName = "notexist"
-	if _, err := serv.GetSummaryByFilter(ctx, start, end, serviceName, userID); err == nil {
+	if _, err := serv.GetSummaryByFilter(ctx, start, end, serviceName, userID, pageNum, pageSize); err == nil {
 		t.Errorf("Expected error %v, got %v", domain.ErrSubsNotFound, err)
 	}
 }

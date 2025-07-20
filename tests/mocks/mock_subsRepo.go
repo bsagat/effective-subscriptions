@@ -48,7 +48,7 @@ func (repo *MockSubsRepo) List(ctx context.Context, userID string) ([]domain.Sub
 		{},
 	}, nil
 }
-func (repo *MockSubsRepo) SubsListByFilter(ctx context.Context, start time.Time, end time.Time, serviceName string, userID string) ([]domain.Subscription, error) {
+func (repo *MockSubsRepo) SubsListByFilter(ctx context.Context, start time.Time, end time.Time, serviceName, userID string, pageNum, pageSize int) ([]domain.Subscription, error) {
 	if serviceName == "notexist" {
 		return []domain.Subscription{}, nil
 	}

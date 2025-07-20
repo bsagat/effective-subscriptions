@@ -171,7 +171,7 @@ func (h *SubsHandler) SummaryHandler(ctx *gin.Context) {
 		return
 	}
 
-	summResp, err := h.serv.GetSummaryByFilter(ctx, summQuery.Start, summQuery.End, summQuery.ServiceName, summQuery.UserID)
+	summResp, err := h.serv.GetSummaryByFilter(ctx, summQuery.Start, summQuery.End, summQuery.ServiceName, summQuery.UserID, summQuery.PageNumber, summQuery.PageSize)
 	if err != nil {
 		h.log.Error("Failed to get summary by filter", "error", err)
 		httputils.SendError(ctx, httputils.GetStatus(err), err)

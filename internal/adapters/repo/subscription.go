@@ -147,7 +147,7 @@ func (repo *SubsRepo) DeleteList(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (repo *SubsRepo) SubsListByFilter(ctx context.Context, start, end time.Time, serviceName, userID string) ([]domain.Subscription, error) {
+func (repo *SubsRepo) SubsListByFilter(ctx context.Context, start, end time.Time, serviceName, userID string, pageNum, pageSize int) ([]domain.Subscription, error) {
 	const op = "SubsRepo.SubsListByFilter"
 	query := `
 		SELECT Service_name, Price, User_ID, Start_date, Exp_date FROM Subscriptions
@@ -167,6 +167,11 @@ func (repo *SubsRepo) SubsListByFilter(ctx context.Context, start, end time.Time
 		query += `AND User_ID = $3 `
 		args = append(args, userID)
 	}
+
+	offset := (pageNum - 1) * pageSize
+	query += fmt.Sprintf(`
+	ORDER BY start_date DESC
+    LIMIT %d OFFSET %d;`, pageSize, offset)
 
 	rows, err := repo.db.Query(ctx, query, args...)
 	if err != nil {

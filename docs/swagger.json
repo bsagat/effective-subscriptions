@@ -431,7 +431,7 @@
         "tags": [
           "Summary"
         ],
-        "description": "Get summary of user subscriptions by optional filters (date range, user ID, service name)",
+        "description": "Get summary of user subscriptions by optional filters (date range, user ID, service name) by pagination",
         "parameters": [
           {
             "name": "start",
@@ -474,6 +474,28 @@
             "schema": {
               "type": "string",
               "example": "Yandex Plus"
+            }
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "description": "Page number, used for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Page size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 3,
+              "default": 10
             }
           }
         ],

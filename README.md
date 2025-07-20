@@ -87,7 +87,7 @@ Here's a snapshot of the Swagger UI:
 * **`/subs/{user_id}` (DELETE)**: Delete all subscriptions for a specific user.
 * **`/subs/{user_id}/{service_name}` (GET)**: Retrieve a specific subscription by user ID and service name.
 * **`/subs/{user_id}/{service_name}` (DELETE)**: Delete a specific subscription by user ID and service name.
-* **`/subs/summary` (GET)**: Get a summary of user subscriptions with optional filters (date range, user ID, service name).
+* **`/subs/summary` (GET)**: Get a summary of user subscriptions with optional filters (date range, user ID, service name, pagination).
 
 For detailed request and response models, refer to the Swagger UI.
 

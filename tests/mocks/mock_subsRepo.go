@@ -2,7 +2,7 @@ package mock
 
 import (
 	"context"
-	"submanager/internal/domain"
+	"submanager/internal/core/domain"
 	"time"
 )
 
